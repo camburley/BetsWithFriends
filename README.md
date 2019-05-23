@@ -1,4 +1,5 @@
-# FLASHELAGUE.GAMES
+# BetsWithFriends
+Original App on Faecbook was called FlashLeague....
 
 ## Changelog
 #### Release v1.2
@@ -56,4 +57,3 @@
 - Git
 - Webhooks (prod, dev)
 - Databse structure
-
