@@ -1,0 +1,147 @@
+<%= stylesheet_link_tag 'bet/index' %>
+
+<script>
+    window.extAsyncInit = function() {
+        MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+            var psid = result.psid;
+            
+        }, function error(errorCode, errorMessage) {      
+            $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+        });
+    }
+</script>
+
+<% if User.find_by(:sender_id => params[:user_id]) %>
+    <div class="wrapper">
+        <section class="slider">
+            <% @games.where(:game_type => 'NFL_FF').limit(5).each do |game| %>
+                <a href="<%= ENV["ROOT_PATH"] %>/games/<%= params[:user_id] %>?game_id=<%= game.id %>">
+                    <section class="game" game-type="<%= game.game_type %>" game-interest="top">
+                        <section class="details">
+                            <div class="text">
+                                <p class="game_type"><%= game.game_type == "NFL_FF" ? "NFL DAILY FANTASY " : game.game_type %></p>
+                                <p class="title"><%= game.title %></p>
+                                <p class="budget">$<span><%= number_to_human game.budget %></span> Salary Cap</p>
+                            </div>
+                        </section>
+                        <div class="image" style="background-image: url('<%= game.image %>')"></div>
+                    </section>
+                </a>   
+            <% end %>
+        </section>
+        
+        
+        <% if false %> 
+            <section class="account">
+                <% if @user.friends.any? %>
+                    <div class="league">
+                        <a href="/account/<%= @user.sender_id %>"><%= image_tag @user.profile_picture.nil? ? 'user_pic' : @user.profile_picture, class: "user" %></a>
+                        <span id="vs">vs</span>
+                        <% @user.friends.each do |f| %>
+                            <% if User.find_by_id(f) %>
+                                <a href="/account/<%= User.find(f).sender_id %>"><%= image_tag User.find(f).profile_picture, class: "user" %></a>
+                            <% end %>
+                        <% end %>
+                    </div>
+                    
+                    <div class="button-league" id="league">
+                        <a href="/account/<%= @user.sender_id %>?show_leagues=true">Show My <span>Leagues</span></a>
+                    </div>
+                <% else %>
+                    <div class="league">
+                        <a href="/account/<%= @user.sender_id %>"><%= image_tag @user.profile_picture.nil? ? 'user_pic' : @user.profile_picture, class: "user" %></a>
+                        <span id="vs">vs</span>
+                        <%= image_tag 'user_pic', class: 'user' %>
+                        <%= image_tag 'user_pic', class: 'user' %>
+                        <%= image_tag 'user_pic', class: 'user' %>
+                        <%= image_tag 'user_pic', class: 'user' %>
+                        <%= image_tag 'user_pic', class: 'user' %>
+                    </div>
+                    
+                    <div class="button-league" id="league">
+                        <a id="create-league" href="#">Create league with <span>Friends</span></a>
+                    </div>
+                <% end %>
+            </section>
+        <% end  %>
+        
+        <section class="menu">
+            <h4>Browse</h4>
+            <ul>
+                <a id="all-games" href="/games/<%= params[:user_id] %>"><li>Start New Game <i class="fa fa-chevron-right" aria-hidden="true"></i></li></a>
+                <a id="account" href="/account/<%= params[:user_id] %>"><li>See My Games <i class="fa fa-chevron-right" aria-hidden="true"></i></li></a>
+            </ul>
+        </section>
+        
+        <section class ="live-games">
+            <h4>Live Games</h4>
+                <% if @bets.any?  %>
+                    <% @bets.each do |bet| %>
+                        <% if Game.find_by(:id => bet.game_id).game_type == "NFL_FF" && User.find_by_id(bet.user_id) && User.find_by_id(bet.opponent) %>
+                            <% if Schedule.first_game(bet.day, bet.week).game_time < Time.now %>
+                                <a href="<%= ENV["ROOT_PATH"] %>/detail_bet/<%= @user.sender_id %>?bet_id=<%= bet.id %>">
+                                    <div class="bet">
+                                        <div class="competitors">
+                                            <div class="user_comp">
+                                                <%= image_tag User.find_by_id(bet.user_id).profile_picture.nil? ? '' : User.find_by_id(bet.user_id).profile_picture %>
+                                                <p class="name"><%= User.find_by_id(bet.user_id).first_name %> <%= User.find_by_id(bet.user_id).last_name %></p>
+                                                <p class="sum-up<%= bet.winner == bet.user_id ? ' winner' : '' %>"><%= bet.closed == true ? bet.user_score : Score.get_scores(bet.user_picked, bet.week) %></p>
+                                            </div>
+                                            <div class="user_comp">
+                                                <%= image_tag User.find_by_id(bet.opponent).profile_picture.nil? ? '' : User.find_by_id(bet.opponent).profile_picture %>
+                                                <p class="name"><%= User.find_by_id(bet.opponent).first_name %> <%= User.find_by_id(bet.opponent).last_name %></p>
+                                                <p class="sum-up<%= bet.winner == bet.opponent ? ' winner' : '' %>"><%= bet.closed == true ? bet.opponent_score : Score.get_scores(bet.opponent_picked, bet.week) %></p>
+                                            </div>
+                                        </div>
+                                        <div class="starts"><%= Game.find_by(:id => bet.game_id).title %></div>
+                                        <div class="team">
+                                            <% if bet.user_id == User.find_by(:sender_id => params[:user_id]).id %>
+                                                <% bet.user_picked.each do |player| %>
+                                                    <div class="player">
+                                                        <%= image_tag Player.find_by_id(player).image.nil? ? 'https://s3.amazonaws.com/vastvideos%2Fnew/693bfc41cb2f0c1b15a5f86e1d849fc0/default.png' : Player.find_by_id(player).image %>
+                                                        <span><%= Player.find_by_id(player).name %></span>
+                                                    </div>
+                                                <% end %>
+                                            <% elsif bet.opponent == User.find_by(:sender_id => params[:user_id]).id  %>
+                                                <% bet.opponent_picked.each do |player| %>
+                                                    <div class="player">
+                                                        <%= image_tag Player.find_by_id(player).image.nil? ? 'https://s3.amazonaws.com/vastvideos%2Fnew/693bfc41cb2f0c1b15a5f86e1d849fc0/default.png' : Player.find_by_id(player).image %>
+                                                        <span><%= Player.find_by_id(player).name %></span>
+                                                    </div>
+                                                <% end %>
+                                            <% end %>
+                                        </div>
+                                        
+                                        <div class="wager">
+                                            <span class="name">Wager</span><span class="value"><%= bet.wage %></span>
+                                        </div>
+                                    </div>
+                                </a>
+                            <% end %>
+                        <% end %>
+                    <% end %>
+                <% else %>
+                    <div class="no-content">
+                        <p>No Live Games Yet</p>
+                    </div>
+                <% end %>
+        </section>
+    </div>
+    
+<% end %>
+<script>
+    $(function(){
+        function kFormatter(num) {
+            return num > 999 ? (num/1000).toFixed(0) + 'k' : num
+        }
+        kFormatter(parseInt($('.budget > span').text()));
+        
+        $('.menu a, #create-league').click(function(){
+            $('.wrapper').animate({
+                "right": "100%"
+            }, 300).delay(1000).animate({
+                "right": "0"
+            }, 300);
+        });
+    });
+</script>

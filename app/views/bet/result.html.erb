@@ -1,0 +1,91 @@
+<%= stylesheet_link_tag 'bet/result' %>
+
+<section class="winner">
+    <div class="money-rain">
+        <%= image_tag "https://cdn.dribbble.com/users/722563/screenshots/3337813/source.gif" || "source.gif" %>
+    </div>
+    <div class="user">
+        <%= image_tag User.find(@bet.winner).profile_picture %>
+        <p><%= User.find(@bet.winner).first_name.upcase %> WON <b>$<%= @bet.wage %>!</b></p>
+    </div>
+    <div class="submit-form">
+        <button class="button">See Details</button>
+    </div>
+</section>
+
+<section class="wrapper">
+    <section class="image" style="background-image: url('<%= @game.image %>')" />
+
+    <section class="description">
+        <span id="title"><%= @game.title %></span>
+        <span id="date"><%= @game.expiration_date.strftime('%b %d, %Y') %></span>
+    </section>
+    
+    <section class="review">
+        <div class="left">
+            <% if @bet.user_picked == "option_a" %>
+                <%= image_tag @user.profile_picture, class: @bet.user_id == @bet.winner ? 'win' : 'lose' %>
+            <% elsif @bet.opponent %>
+                <%= image_tag User.find(@bet.opponent).profile_picture, class: @bet.opponent == @bet.winner ? 'win' : 'lose' %>
+            <% else %>
+                <%= image_tag "" %>
+            <% end %>
+        </div>
+        
+        <span id="vs" style="width: 200px; text-align: center; margin: 16px 0;"><%= User.find(@bet.winner).first_name.upcase %> WON!</span>
+        
+        <div class="right">
+            <% if @bet.user_picked == "option_b" %>
+                <%= image_tag @user.profile_picture, class: @bet.user_id == @bet.winner ? 'win' : 'lose' %>
+            <% elsif @bet.opponent %>
+                <%= image_tag User.find(@bet.opponent).profile_picture, class: @bet.opponent == @bet.winner ? 'win' : 'lose' %>
+            <% else %>
+                <%= image_tag "" %>
+            <% end %>
+        </div>
+    </section>
+    
+    <p id="label" style="background: #fff; border-bottom: none;">H2H SCORE</p>
+    <section class="score">
+        <div class="left">
+            <p><%= @wins ? @wins.count(@bet.user_id) : 0 %></p>
+        </div>
+        
+        <span id="vs"> - </span>
+        
+        <div class="right">
+            <p><%= @wins ? @wins.count(@bet.opponent) : 0 %></p>
+        </div>
+    </section>
+    
+    <div class="submit-form">
+        <a class="button" ><i class="fa fa-user" aria-hidden="true"></i>My Account</a>
+    </div>
+</section>
+
+<script>
+    
+    $(document).ready(function(){
+        var psid;
+        
+        window.extAsyncInit = function() {
+            MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+                psid = result.psid;
+                
+                $('.submit-form button').click(function(){
+                    $('.winner').fadeOut(500, function(){
+                        
+                        wrapper.fadeIn(500);
+                        $(this).remove();
+                        
+                        $('#account').attr('href', '<%= ENV['ROOT_PATH'] %>/bet/account/'+ psid);
+                    }); 
+                });
+                
+            }, function error(errorCode, errorMessage) {      
+                $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+            });
+        }
+        
+    });
+</script>

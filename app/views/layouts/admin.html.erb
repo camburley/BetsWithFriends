@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BetMessenger</title>
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag    'admin', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'admin', 'data-turbolinks-track': 'reload' %>
+    
+    <meta name='viewport' content='width=device-width, maximum-scale=1.0, minimum-scale=1.0, initial-scale=1.0, user-scalable=no' />
+  </head>
+
+  <body>
+    <nav>
+  		<div class="logo">
+  			<%= image_tag 'logo.png' %>
+  		</div>
+  		<ul class="menu">
+  			<a href="admin/add_players"><li>Create</li></a>
+  		</ul>
+  	</nav>
+  	
+  	<section class="wrapper">
+      <%= yield %>
+    </section>
+  </body>
+</html>

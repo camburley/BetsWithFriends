@@ -1,0 +1,48 @@
+<%= stylesheet_link_tag 'bet/league' %>
+
+<script>
+    window.extAsyncInit = function() {
+        MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+            var psid = result.psid;
+            
+            loadContent(psid);
+        }, function error(errorCode, errorMessage) {      
+            $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+        });
+    }
+    
+    function loadContent(psid) {
+        if( <%= @player_array %>.includes(parseInt(psid)) ) {
+            window.location.replace("<%= ENV['ROOT_PATH'] %>/leaderboard/<%= @league.id %>");
+        } else {
+            $('.submit-form button').click(function() {
+                $.ajax({
+                    url : '<%= ENV['ROOT_PATH'] %>/accept_league/' + <%= @league.id %>,
+                    type : 'POST',
+                    data : {
+                        'accept_league': true, 'league_id': <%= @league.id %>, 'user_id': psid
+                    },
+                    dataType:'json',
+                    success : function(data) {
+                        window.location.replace("<%= ENV['ROOT_PATH'] %>/leaderboard/<%= @league.id %>");
+                    }
+                });
+            });   
+        }
+    }
+</script>
+
+<div class="wrapper">
+    <section class="user">
+        <%= image_tag @user.profile_picture %>
+        <p>Your friend <b><%= @user.first_name %></b> has invited you to the daily league</p>
+    </section>
+    
+    <section class="league">
+        <p><%= @league.title %></p>
+    </section>
+    
+    <div class="submit-form">
+        <button class="button">ACCEPT INVITATION</button>
+    </div>
+</div>

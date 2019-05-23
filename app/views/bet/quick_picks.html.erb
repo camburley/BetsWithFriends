@@ -1,0 +1,42 @@
+<%= stylesheet_link_tag 'bet/quick_picks' %>
+
+<div class="wrapper">
+    <% @games.each do |game| %>
+        <section class="game" game-type="<%= game.game_type %>" game-interest="top">
+            <div class="image">
+                <%= image_tag game.image %>
+            </div>
+            <div class="pick-bet">
+                <%= link_to "CREATE GAME", bet_create_path(game.id) , class: "button" %>
+            </div>
+            <section class="details">
+                <div class="time">
+                <p><%= game.start_date.strftime('%l:%M') %></br><span><%= game.start_date.strftime('%p') %></span></p>
+                </div>
+                <div class="text">
+                    <p class="title"><%= game.title %></p>
+                    <p class="location"><%= game.description %></p>
+                    <p class="interest"><%= Rumoji.decode(":fire:") %> <%= Bet.where(:game_id => game.id).count %> People interested</p>
+                </div>
+                <div class="date">
+                    <p><%= game.start_date.strftime('%d') %></br><span><%= game.start_date.strftime('%b') %></span></p>
+                </div>
+            </section>
+        </section>
+    <% end %>
+</div>
+
+<script>
+    $(document).ready(function(){
+        var psid;
+        
+        window.extAsyncInit = function() {
+            MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+                psid = result.psid;
+                
+            }, function error(errorCode, errorMessage) {      
+                $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+            });
+        }
+    });
+</script>

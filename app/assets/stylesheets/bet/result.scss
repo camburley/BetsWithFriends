@@ -1,0 +1,31 @@
+@import "variables";
+
+.winner { position: relative; top: -50px;
+    .money-rain { background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%);
+        img { width: 100%; max-width: 300px; margin: auto; display: block; }
+    }
+    .user { text-align: center;
+        img { display: block; margin: 0 auto; width: 80px; height: 80px; border-radius: 50%; }
+        p { font-size: 26px; font-weight: 200; }
+    }
+}
+
+.wrapper { display: none;
+    .image { background-size: cover; height: 20vh; min-height: 150px; }
+    .review { padding: 5px 15px; border-bottom: 1px solid #eee; display: flex;
+        .left, .right { width: 45% }
+        img { height: 50px; width: 50px; border-radius: 50%; 
+            &.win { border: 2px solid #27ae60; }
+            &.lose { opacity: 0.5; }
+        }
+        span { margin: 16px; }
+        .left img, .right span { float: left; }
+        .left span, .right img { float: right; }
+    }
+    
+    .score { padding: 5px 15px; display: flex; text-align: center;
+        .left, .right { width: 45% }
+        span { margin: 22px; }
+        span, p { font-size: 24px; }
+    }
+}

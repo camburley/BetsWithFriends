@@ -1,0 +1,78 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require font-awesome
+ *= require bet
+*/
+ 
+@import "font-awesome";
+@import "variables";
+
+html, body { overflow-x: hidden; }
+body { width: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+
+// BUTTON TEMPLATE
+.submit-form { position: fixed; bottom: 0; width: 100%; left: 0; padding: 10px 0; border-top: $border; background-color: $white;
+    button.button { font-size: 13px; padding: 15px 0;}
+    .button { background-color: $blue; -webkit-appearance: none; display: block; padding: 10px 0; margin: 0 auto; width: 90%; text-align: center; color: $white; text-decoration: none; border-radius: 4px; cursor: pointer; border: none; 
+        i { margin-right: 15px; }
+    }
+}
+
+// RADIO TEMPLATE
+.radio { padding: 13px 25px; border-bottom: 1px solid #eee; background-color: #fff;
+  label { font-size: 14px; }
+  input[type="radio"] { position: absolute; opacity: 0;
+    + .radio-label {
+      &:before { content: ''; background: $gray; border-radius: 100%; border: 1px solid darken($gray, 25%); display: inline-block; width: 18px; height: 17px; position: relative; margin-right: 1em;  vertical-align: top; cursor: pointer; text-align: center; transition: all 250ms ease; }
+    }
+    &:checked + .radio-label { 
+        &:before { background-color: $blue; box-shadow: inset 0 0 0 4px $gray; }
+    }
+    &:focus + .radio-label {
+        &:before { outline: none; border-color: $blue; }
+    }
+    &:disabled + .radio-label {
+        &:before { box-shadow: inset 0 0 0 4px $gray; border-color: darken($gray, 25%); background: darken($gray, 25%); }
+    }
+    + .radio-label:empty {
+        &:before { margin-right: 0; }
+    }
+  }
+}
+
+// WRAPPER GLOBAL
+.wrapper{
+    p#label { padding: 13px 20px 7px; margin: 0; background-color: $gray_2; color: #a7a6a6; font-size: 12px; font-weight: 100; border-bottom: $border;}
+    
+    .description { padding: 10px 15px; display: flex; border-bottom: $border; background-color: #fff;
+        span#title { width: 70%; font-size: 14px; font-weight: $text_bold; }
+        span#date { width: 30%; text-align: right; font-size: 12px; font-weight: 100; color: #888; line-height: 18px; }
+    }
+}
+
+.create-league { height: 100vh; background-color: $gray;
+    label { padding-left: 10px; font-size: $text_8; color: #A8A8A8; }
+    input { display: block; padding-left: 10px; margin-top: 10px; height: 50px; width: 100%; border: none; font-size: $text_14; outline: none; border-bottom: $border; border-top: $border;}
+}
+
+// ERROR & SUCCESS TEMPLATE
+.error { text-align: center; padding: 35vh 10px 0;
+    h2 { color: #555; font-weight: 300; }
+    p { color: #aaa; font-size: 14px; font-weight: 100; }
+}
+
+.success { text-align: center; padding: 35vh 10px 0;
+    i { color: #27ae60; font-size: 52px; }
+    h2 { color: #555; font-weight: 300; }
+    p { color: #aaa; font-size: 14px; font-weight: 100; }
+}

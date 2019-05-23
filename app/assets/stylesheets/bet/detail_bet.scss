@@ -1,0 +1,35 @@
+@import "variables";
+
+.bet {
+    .competitors { border-bottom: $border;
+        .user_comp { display: flex; padding: 5px 10px;
+            img { height: 30px; width: 30px; border-radius: 50%; }
+            p.name, p.sum-up { padding: 8px 10px; margin: 0; font-size: 13px; color: #555; width: 50%; }
+            p.sum-up { text-align: right; font-size: 26px; padding: 0; }
+            p.winner { color: $blue; }
+        }
+    }
+    
+    .nav { display: flex; margin: 30px 0; border-radius: 4px; overflow: hidden;
+        button { background-color: #fff; color: $blue; border: none; transition: all 0.5s; outline: none; border: none; width: 50%; padding: 5px 0; border: 1px solid $blue; -webkit-appearance: none; appearance: none;
+            &.active { background-color: $blue; color: #fff; }
+        }
+    }
+    
+    .player-obj { display: flex; list-style: none; padding: 7px 5px; border-bottom: $border; white-space: nowrap; height: 55px;
+        div p { margin: 0; }
+        .image { width: 20%; padding: 0 5px; text-align: center; height: 100%;
+            img { height: 100%; max-width: 100%;}
+        }
+        .player { width: 50%; padding: 0 15px 0 0; overflow: hidden;
+            p#name { font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+                span { color: $blue; }
+            }
+            p#teams, {margin-bottom: 5px;}
+            p#teams, p#time { font-size: 11px; color: $gray; }
+        }
+        .player-info { width: 20%; padding: 15px 0; text-align: right;
+            p#points { font-size: 22px; color: #555; }
+        }
+    }
+}

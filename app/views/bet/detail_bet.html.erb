@@ -1,0 +1,82 @@
+<%= stylesheet_link_tag 'bet/detail_bet' %>
+
+<script>
+    window.extAsyncInit = function() {
+        MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+            var psid = result.psid;
+            
+        }, function error(errorCode, errorMessage) {      
+            $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+        });
+    }
+    
+    function openTab(classID, tabID) {
+        var tablinks = $('.tablinks');
+        var tabcontent = $('.team_players');
+        
+        tablinks.removeClass('active');
+        $('.'+classID).addClass('active');
+        
+        tabcontent.fadeOut(function(){
+           $('#'+tabID).fadeIn(); 
+        });
+    }
+</script>
+
+<div class="wrapper">
+    <div class="bet">
+        <p id="label">Score</p>
+        <section class="competitors">
+            <div class="user_comp">
+                <%= image_tag User.find_by_id(@bet.user_id).profile_picture.nil? ? '' : User.find_by_id(@bet.user_id).profile_picture %>
+                <p class="name"><%= User.find_by_id(@bet.user_id).first_name %> <%= User.find_by_id(@bet.user_id).last_name %></p>
+                <p class="sum-up<%= @bet.winner == @bet.user_id ? ' winner' : '' %>"><%= Score.get_scores(@bet.user_picked, @bet.week) %></p>
+            </div>
+            <div class="user_comp">
+                <%= image_tag User.find_by_id(@bet.opponent).profile_picture.nil? ? '' : User.find_by_id(@bet.opponent).profile_picture %>
+                <p class="name"><%= User.find_by_id(@bet.opponent).first_name %> <%= User.find_by_id(@bet.opponent).last_name %></p>
+                <p class="sum-up<%= @bet.winner == @bet.opponent ? ' winner' : '' %>"><%= Score.get_scores(@bet.opponent_picked, @bet.week) %></p>
+            </div>
+        </section>
+        
+        <section class="nav">
+            <button class="user tablinks active" onclick="openTab('user', 'user-list');"><%= User.find_by_id(@bet.user_id).first_name %></button>
+            <button class="opponent tablinks" onclick="openTab('opponent', 'opponent-list');"><%= User.find_by_id(@bet.opponent).first_name %></button>
+        </section>
+        
+        <section class="teams">
+            <div class="team_players" id="user-list">
+                <% @bet.user_picked.each do |id| %>
+                    <div class="player-obj">
+                        <div class="image">
+                            <%= image_tag Player.find(id).image.nil? ? 'https://s3.amazonaws.com/vastvideos%2Fnew/693bfc41cb2f0c1b15a5f86e1d849fc0/65x90_default.png' : Player.find(id).image %>
+                        </div>
+                        <div class="player">
+                            <p id="name"><span><%= Player.find(id).position %></span> <%= Player.find(id).name %></p>
+                            <p id="teams"><b style="color: #555;"><%= Player.find(id).team %></b> vs <%= Player.find(id).opponent %></p>
+                        </div>
+                        <div class="player-info">
+                            <p id="points"><%= Score.get_score(id, @bet.week) %></p>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+            <div class="team_players" id="opponent-list" style="display: none;">
+                <% @bet.opponent_picked.each do |id| %>
+                    <div class="player-obj">
+                        <div class="image">
+                            <%= image_tag Player.find(id).image.nil? ? 'https://s3.amazonaws.com/vastvideos%2Fnew/693bfc41cb2f0c1b15a5f86e1d849fc0/65x90_default.png' : Player.find(id).image %>
+                        </div>
+                        <div class="player">
+                            <p id="name"><span><%= Player.find(id).position %></span> <%= Player.find(id).name %></p>
+                            <p id="teams"><b style="color: #555;"><%= Player.find(id).team %></b> vs <%= Player.find(id).opponent %></p>
+                        </div>
+                        <div class="player-info">
+                            <p id="points"><%= Score.get_score(id, @bet.week) %></p>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </section>
+    </div>
+</div>

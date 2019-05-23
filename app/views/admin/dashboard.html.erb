@@ -1,0 +1,36 @@
+<%= stylesheet_link_tag 'admin/dashboard' %>
+
+<div class="heading">
+	<h1>Create New Contest</h1>
+</div>
+<%= form_tag admin_path, :authenticity_token => true do %>
+	<label>CONTEST TYPE</label>
+	<select name="contest_type" id="contest_type">
+		<option value="NFL">NFL</option>
+		<option value="NBA">NBA</option>
+		<option value="GOT">GOT</option>
+		<option value="NBA">NBA</option>
+		<option value="NFL_FF">NFL FANTASY DAILY</option>
+	</select>
+	
+	<label>QUESTION</label>
+	<input type="text" name="title" id="title" placeholder="title:" required>
+	<input type="text" name="description" id="description" placeholder="description:" required>
+    <div class="selection">
+    	<input type="text" name="options[]" class="option" placeholder="option A:" multiple>
+    	<input type="text" name="options[]" class="option" placeholder="option B:" multiple>
+    	<i class="fa fa-plus-circle add-option" aria-hidden="true"></i>
+    </div>
+	
+	<label>WHEN</label>
+	<input type="datetime-local" name="start_date" id="start_date">
+	<input type="datetime-local" name="expiration_date" id="expiration_date">
+
+	<label>LINKS</label>
+	<input type="url" name="image" id="image" placeholder="image URL:" required>
+	<input type="url" name="validation_url" id="validation_url" placeholder="validation URl:">
+
+	<button type="submit" id="submit">Submit<i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+<% end %>
+
+<%= javascript_include_tag 'admin/dashboard' %>

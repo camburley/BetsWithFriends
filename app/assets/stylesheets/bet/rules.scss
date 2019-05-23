@@ -1,0 +1,6 @@
+@import "variables";
+
+p#label { padding: 13px 15px 7px; margin: 0; background-color: $gray_2; color: #a7a6a6; font-size: 12px; font-weight: 100; border-bottom: $border;}
+.rules, .notes { border-bottom: $border;
+    p { font-size: $text_10; line-height: 16pt; padding: 0 15px; }
+}

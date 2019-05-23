@@ -1,0 +1,98 @@
+<%= stylesheet_link_tag 'bet/league' %>
+
+<div class="wrapper">
+    <section class="header">
+        <div class="name">
+            <p>League Members</p>
+        </div>
+        <div class="new-game">
+            <a href="#">+ New Game</a>
+        </div>
+    </section>
+    
+    <section class="players">
+        <% if @league_players.any? %>
+            <% @league_players.each do |player| %>
+                <% if User.find_by(:id => player) %>
+                    <div class="player" data-wins="<%= Bet.where(:winner => player.id).where.not(:opponent => nil).order('closed DESC').count %>">
+                        <%= image_tag player.profile_picture %>
+                        <p><%= player.first_name %> <%= player.last_name %></p>
+                        <span><%= Bet.where(:winner => player.id).where.not(:opponent => nil).order('closed DESC').count %></span>
+                    </div>
+                <% end %>
+            <% end %>
+        <% end %>
+    </section>
+    
+    
+    <div class="submit-form">
+        
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        var psid;
+        
+        window.extAsyncInit = function() {
+            MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+                psid = result.psid;
+                var type = result.thread_type
+                
+                $('.new-game a').attr('href', '/bet/'+psid)
+                if(psid == <%= @user.sender_id %>) {
+                    $('.submit-form').append('<button class="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i>Invite Friend to League</button>')
+                    
+                    $('.submit-form button').click(function() {
+                        var messageToShare = {
+                            "attachment":{
+                               "type":"template",
+                               "payload":{
+                                   "template_type":"generic",
+                                   "elements": [{
+                                       "title": "Your friend <%= @user.first_name %> <%= @user.last_name %> just invited you to the league!",
+                                       "image_url": "https://scontent-iad3-1.xx.fbcdn.net/v/t31.0-8/20818803_111294292878713_4184094324252763436_o.png?oh=101021ebc7e2db09cdb3fee3877e8802&oe=5A2F23C4",
+                                       "subtitle": "<%= @league.title %>",
+                                       "buttons":[{
+                                           "type":"web_url",
+                                           "url":"<%= ENV["ROOT_PATH"] %>/accept_league/" + <%= @league.id %>,
+                                           "title":"See Details",
+                                           "messenger_extensions": true,
+                                           "webview_height_ratio": "tall",
+                                           "fallback_url": "<%= ENV["ROOT_PATH"] %>/accept_league/" + <%= @league.id %>
+                                       }]
+                                   }]
+                               }
+                            }
+                        };
+                        
+                        var share_type = type == "USER_TO_USER" ? 'current_thread' : "broadcast";
+                        MessengerExtensions.beginShareFlow(function success(response) {
+                            
+                        }, function error(errorCode, errorMessage) {      
+                            $('.wrapper').fadeOut(function(){
+                          	    $(this).html('<div class="error"><h2>Something went wrong</h2><p>Bet was created, but we could\'t finished sharing.</p></div>').fadeIn(function(){
+                          	        setTimeout(function(){
+                                      MessengerExtensions.requestCloseBrowser(); 
+                                    }, 1000);
+                          	    });
+                            });
+                        },
+                        messageToShare, share_type); 
+                    });
+                    
+                } else {
+                    $('.submit-form').append('<a href="/account/'+ psid +'" class="button" >My Account</a>');
+                }
+                
+            }, function error(errorCode, errorMessage) {      
+                $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+            });
+        }
+        
+        var players = $(".player");
+        players.sort(function(a, b){ return $(b).data("wins")-$(a).data("wins")});
+        
+        $(".players").html(players);
+    });
+</script>

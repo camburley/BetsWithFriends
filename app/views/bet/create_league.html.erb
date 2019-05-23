@@ -1,0 +1,45 @@
+<%= stylesheet_link_tag 'bet/league' %>
+
+<script>
+    window.extAsyncInit = function() {
+        
+        MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+            var psid = result.psid;
+            
+            loadContent(psid);
+        }, function error(errorCode, errorMessage) {      
+            $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+        });
+    }
+</script>
+
+<div class="wrapper">
+    <section class="create-league">
+        <label for="league_name">Add League Name</label>
+        <input type="text" name="league_name" id="league_name" placeholder="i.e. Sundays > Saturdays" required></input>
+        
+        <div class="submit-form">
+            <button class="button">Create New League</button>
+        </div>
+    </section>
+</div>
+
+<script>
+    function loadContent(psid){
+        $('.submit-form button').click(function() {
+            var title = $('#league_name').val();
+            
+            $.ajax({
+                url : '<%= ENV['ROOT_PATH'] %>/create_league/'+ psid,
+                type : 'POST',
+                data : {
+                    'create_league': true, 'title': title
+                },
+                dataType:'json',
+                success : function(data) {
+                    window.location.replace("<%= ENV['ROOT_PATH'] %>/leaderboard/"+ data["league_id"]);
+                }
+            });
+        });
+    }
+</script>

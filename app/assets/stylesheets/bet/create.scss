@@ -1,0 +1,17 @@
+@import "variables";
+
+.wrapper { min-height: 100vh;
+    .image { background-size: cover; min-height: 180px; }
+    
+    .notification { margin-top: 20px; }
+    .wager { padding-bottom: 100px;
+        .dropdown { position: absolute; right: 20px; font-size: 30px; margin-top: 5px; color: #3197ee; cursor: pointer; }
+        .set { display: none; border-bottom: $border; padding: 5.5px 25px; background-color: #fff; height: 30px;
+            span#wage { line-height: 30px; }
+            button { color: #0084FF; font-size: 22px; background: none; border: none; outline: none; cursor: pointer; -webkit-appearance: none;
+                &:active, &:focus { background: none; background-color: none; }
+            }
+        }
+        .set[selected] { display: block !important; }
+    }
+}

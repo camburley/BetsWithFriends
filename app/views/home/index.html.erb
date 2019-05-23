@@ -1,0 +1,9 @@
+<div id="user-widget">
+  <% if current_admin %>
+    Welcome <strong><%= current_admin.first_name %></strong>!
+    <%= link_to "Sign out", signout_path, id: "sign_out" %>
+    <%= link_to "Admin", admin_path %>
+  <% else %>
+    <%= link_to "Sign in with Facebook", "/auth/facebook", id: "sign_in" %>
+  <% end %>
+</div>

@@ -1,0 +1,48 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require font-awesome
+ *= require_self
+ */
+
+@import "font-awesome";
+
+@font-face {
+    font-family: 'Proxima Nova Regular';
+    src: asset-url('proxima-nova-regular.eot');
+    src: asset-url('proxima-nova-regular.eot?') format('embedded-opentype'), 
+    	asset-url('proxima-nova-regular.woff') format('woff'), 
+    	asset-url('proxima-nova-regular.svg') format('svg'), 
+    	asset-url('proxima-nova-regular.ttf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+   
+body { background-color: #fafafa; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; font-family: 'Proxima Nova Regular'; min-width: 320px; margin: 0 0 100px; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { -webkit-border-radius: 5px; border-radius: 5px; }
+::-webkit-scrollbar-thumb { -webkit-border-radius: 5px; border-radius: 5px; background: rgb(127, 140, 141); }
+::-webkit-scrollbar-thumb:window-inactive { background: rgb(127, 140, 141); }
+
+nav { display: flex; height: 45px; border-bottom: 1px solid #ccc; padding: 5px 10px; background-color: #fff;
+  .logo { height: 100%; width: 50%;
+    img { height: 100%; }
+  }
+  ul.menu { text-align: right; width: 50%; margin: 12px 0;
+    li { display: inline-block; padding: 0 20px; font-size: 18px; }
+  }
+}
+
+section.wrapper { margin: 0 50px;
+  .heading h1 { color: #003F69; font-size: 32px; font-weight: 300; }
+}

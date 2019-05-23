@@ -1,0 +1,100 @@
+<%= stylesheet_link_tag 'bet/games' %>
+
+<script>
+    window.extAsyncInit = function() {
+        MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+            var psid = result.psid;
+            
+        }, function error(errorCode, errorMessage) {      
+            $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+        });
+    }
+</script>
+
+<div class="wrapper">
+    <section class="daily-games">
+        <h4>Select Game Type</h4>
+        <ul class="game-list">
+        <% @games.each do |game| %>
+            <li game="<%= game.id %>"><%= game.title %><i class="fa fa-chevron-right" aria-hidden="true"></i></li>        
+        <% end %>
+        </ul>
+    </section>
+    
+    <section class="pick-day">
+        <h4>Select Game Time</h4>
+        <ul class="day-list">
+            <li day="4">Thursday Games Only<i class="fa fa-chevron-right" aria-hidden="true"></i></li>
+            <li day="0">Sunday Games Only <i class="fa fa-chevron-right" aria-hidden="true"></i></li>
+            <li day="1">Monday Games Only<i class="fa fa-chevron-right" aria-hidden="true"></i></li>
+            <li day="10">Sunday + Monday Games<i class="fa fa-chevron-right" aria-hidden="true"></i></li>
+            <li day="7">Remaining Games This Week<i class="fa fa-chevron-right" aria-hidden="true"></i></li>
+        </ul>
+    </section>
+</div>
+
+<script>
+    $(function(){
+        <% if params[:game_id] %>
+            var daily_games = $('.daily-games');
+            var pick_day = $('.pick-day');
+            var game_list = $('.game-list li');
+            var day_list = $('.day-list li');
+            
+            game_list.removeAttr('selected');
+            $(this).attr('selected', true);
+            
+            daily_games.animate({
+                "right": "100%"
+            }, 300).after(function(){
+                pick_day.show().animate({
+                    "left": "0"
+                }, 300);
+            });
+            
+            var game_id = <%= params[:game_id] %>
+            day_list.click(function(){
+                day_list.removeAttr('selected');
+                $(this).attr('selected', true);
+                var day = $(this).attr('day');
+                
+                $('.wrapper').fadeOut(function(){
+                    $('.loader').fadeIn(function(){
+                        window.location.replace("/pick_team/"+<%= params[:user_id]%>+"?game_id="+game_id+"&day="+day);
+                    });
+                });
+            });
+        <% else %>
+            $('.game-list li').click(function(){
+                var daily_games = $('.daily-games');
+                var pick_day = $('.pick-day');
+                var game_list = $('.game-list li');
+                var day_list = $('.day-list li');
+                
+                game_list.removeAttr('selected');
+                $(this).attr('selected', true);
+                
+                daily_games.animate({
+                    "right": "100%"
+                }, 300).after(function(){
+                    pick_day.show().animate({
+                        "left": "0"
+                    }, 300);
+                });
+                
+                var game_id = $(this).attr('game');
+                day_list.click(function(){
+                    day_list.removeAttr('selected');
+                    $(this).attr('selected', true);
+                    var day = $(this).attr('day');
+                    
+                    $('.wrapper').fadeOut(function(){
+                        $('.loader').fadeIn(function(){
+                            window.location.replace("/pick_team/"+<%= params[:user_id]%>+"?game_id="+game_id+"&day="+day);
+                        });
+                    });
+                });
+            }); 
+        <% end %>
+    });
+</script>

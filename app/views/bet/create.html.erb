@@ -1,0 +1,131 @@
+<%= stylesheet_link_tag 'bet/create' %>
+
+<div class="wrapper">
+    <section class="image" style="background-image: url('<%= @game.image %>')" />
+    
+    <section class="description">
+        <span id="title"><%= @game.title %></span>
+        <span id="date"><%= @game.created_at.strftime('%b %d, %Y') %></span>
+    </section>
+    
+    <section class="pick">
+        <p id="label">CHOOSE POSITION</p>
+        <% @game.options.each_with_index do |o, i| %>
+            <div class="radio">
+              <input id="option_<%= i %>" name="picked" type="radio" value="<%= i %>" <%= "checked" if i == 0 %>>
+              <label for="option_<%= i %>" class="radio-label"><%= o %></label>
+            </div>
+        <% end %>
+    </section>
+    
+    <section class="wager">
+        <p id="label">SET WAGER</p>
+        <i class="fa fa-angle-down dropdown" aria-hidden="true"></i>
+        <% @wagers.each_with_index do |wager, i| %>
+            <div class="set" <%= i == 0 ? 'selected="selected"' : '' %>>
+                <span id="wage"><%= Rumoji.decode(wager) %></span>
+            </div>
+        <% end %>
+    </section>
+    
+    <section class="submit-form">
+        <button class="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i>Invite Friend to Game</button>
+    </section>
+</div>
+
+<script>
+    $(document).ready(function(){
+        var psid;
+        
+        window.extAsyncInit = function() {
+            
+            MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+                psid = result.psid;
+                var type = result.thread_type
+                
+                $('.submit-form button').click(function() {
+                    var token, pick, wage, game_id;
+                    game_id = <%= @game.id %>;
+                    pick = $('input[name=picked]:checked').val();
+                    wage = $('.set[selected]').find('#wage').text();
+                    
+                    $.ajax({
+                        url : '<%= ENV['ROOT_PATH'] %>/bet/create/' + game_id,
+                        type : 'POST',
+                        data : {
+                            'create': true, 'game_id': game_id, 'picked': pick, 'wage': wage, 'token': psid
+                        },
+                        dataType:'json',
+                        success : function(data) {
+                            var messageToShare = {
+                                "attachment":{
+                                   "type":"template",
+                                   "payload":{
+                                       "template_type":"generic",
+                                       "elements": [{
+                                           "title": "Your friend " + data['user_name'] + " just challenged you for a" + data['wage'] + "!",
+                                           "image_url": "<%= @game.image %>"|| "https://s3.amazonaws.com/audiencetrending/facebook_handshake.png",
+                                           "subtitle": "<%= @game.title %>",
+                                           "buttons":[{
+                                               "type":"web_url",
+                                               "url":"<%= ENV["ROOT_PATH"] %>/bet/accept/" + data['bet_id'],
+                                               "title":"See Details",
+                                               "messenger_extensions": true,
+                                               "webview_height_ratio": "tall",
+                                               "fallback_url": "<%= ENV["ROOT_PATH"] %>/bet/accept/" + data['bet_id']
+                                           }]
+                                       }]
+                                   }
+                                }
+                            };
+                              
+                            shareMessage(messageToShare);
+                        }
+                    });
+                    
+                    function shareMessage(messageToShare) {
+                        var share_type = type == "USER_TO_USER" ? 'current_thread' : "broadcast";
+                        MessengerExtensions.beginShareFlow(function success(response) {
+                            $('.wrapper').fadeOut(function(){
+                                $(this).html('<div class="success"><i class="fa fa-check-circle" aria-hidden="true"></i><h2>Bet was Created!</h2><p>Your friend received notification.</p></div>').fadeIn(function(){
+                                    setTimeout(function(){
+                                      MessengerExtensions.requestCloseBrowser(); 
+                                    }, 1000);
+                                });
+                            });
+                        }, function error(errorCode, errorMessage) {      
+                            $('.wrapper').fadeOut(function(){
+                          	    $(this).html('<div class="error"><h2>Something went wrong</h2><p>Bet was created, but we could\'t finished sharing.</p></div>').fadeIn(function(){
+                          	        setTimeout(function(){
+                                      MessengerExtensions.requestCloseBrowser(); 
+                                    }, 1000);
+                          	    });
+                            });
+                        },
+                        messageToShare, share_type); 
+                    }
+                });
+                
+            }, function error(errorCode, errorMessage) {      
+                $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+            });
+            
+            var dropdown, selection, wager;
+            dropdown = $('.dropdown');
+            selection = $('.set');
+            
+            dropdown.click(function(){
+                dropdown.fadeOut(250);
+                selection.removeAttr('selected');
+                selection.show(0, function(){
+                    $(this).click(function(){
+                        $(this).attr('selected', true);
+                        selection.hide();
+                        dropdown.fadeIn(250);
+                    });
+                });
+            });
+        }
+    
+    });
+</script>

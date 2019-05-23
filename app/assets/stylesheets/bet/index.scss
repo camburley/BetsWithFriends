@@ -1,0 +1,82 @@
+@import "variables";
+
+.wrapper { padding: 10px; position: relative;}
+
+.slider { white-space: nowrap; overflow-x: scroll; padding-bottom: 10px;
+    &::-webkit-scrollbar { display: none; }
+    a { color: #000; text-decoration: none; }
+    .game { margin-right: 10px; display: inline-block; width: 90%;
+        .image { width: 100%; height: 180px; background-size: cover; border-radius: 4px; }
+        
+        .details { 
+            .text { width: 100%; margin-bottom: 5px;
+                p { font-size: $text_12; font-weight: $text_med; margin: 0;
+                    &.game_type { font-size: $text_11; font-weight: $text_thin; color: $red; padding: 2px 0px 5px ; }
+                    &.budget { font-size: $text_11; font-weight: $text_thin; color: $gray_5; }
+                }
+            }
+        }
+    }
+}
+
+.account { border: $border; white-space: nowrap; border-radius: 4px;
+    .league { padding: 10px 0; text-align: center;
+        img.user { height: 50px; width: 50px; border-radius: 50%; }
+        span#vs { position: relative; bottom: 20px; font-weight: $text_med;}
+    }
+    
+    .button-league { text-align: center; font-size: $text_12; padding: 10px 0; border-top: $border;
+        a { text-decoration: none; color: #000;
+            span { font-weight: $text-med; color: $blue;}
+        }
+    }
+}
+
+.menu h4, .live-games h4 { margin: 15px 10px; }
+.menu {
+    ul { margin: 0; padding: 0;
+        a { text-decoration: none; color: $blue;
+            li { list-style: none; padding: 14px; border-bottom: $border;
+                i { float: right; margin-top: 3px; font-size: $text_8;}
+            }
+            
+            &:nth-child(1) li { border-top: $border; }
+        }
+    }
+}
+
+.live-games a { text-decoration: none; }
+.bet { border: $border; margin-bottom: 30px; color: #000;
+   .starts { padding: 10px; font-size: 13px; border-bottom: $border; background: #ffffff;
+       #time-remains { float: right; }
+   }
+   .game-name { padding: 5px 10px; } 
+   .team { padding: 5px 10px; border-bottom: $border;
+       .player { display: inline-block; height: 80px; width: 60px; text-align: center;
+           img { height: 60px; max-width: 60px; border-radius: 50%; }
+           span { display: block; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+       }
+   }
+   .competitors { border-bottom: $border; background: #f7f7f7;
+       .user_comp { display: flex; padding: 5px 10px;
+           img { height: 30px; width: 30px; border-radius: 50%; }
+           p.name, p.sum-up { padding: 8px 10px; margin: 0; font-size: 13px; color: #888; width: 50%; }
+           p.sum-up { text-align: right; font-size: 26px; padding: 0; }
+           p.winner { color: $blue; }
+       }
+       .vs { display: flex; padding: 5px 10px;
+           img { height: 30px; width: 30px; border-radius: 50%; 
+               &:nth-child(2) { position: relative; right: 10px; }
+           }
+           p.name { padding: 8px 10px; margin: 0; font-size: 13px; color: #888; }
+       }
+   }
+   .wager { padding: 15px; margin-bottom: 7px; font-size: 13px; color: #555;
+       .name { float: left; position: relative; bottom: 7px; }
+       .value { float: right; position: relative; bottom: 10px; }
+   }
+}
+
+.no-content {
+    p { text-align: center; margin-top: 50px; padding: 15px; color: #ccc; border-bottom: $border; border-top: $border; font-size: 13px; }
+}

@@ -1,0 +1,102 @@
+<%= stylesheet_link_tag 'bet/accept' %>
+
+<div class="wrapper">
+    <section class="image" style="background-image: url('<%= @game.image %>')" />
+
+<section class="description">
+    <span id="title"><%= @game.title %></span>
+        <span id="date"><%= (@game.created_at + Time.zone_offset('EST')).strftime('%b %d, %Y') %><br /><%= (@game.created_at + Time.zone_offset('EST')).strftime('%l:%M%p') %></span>
+    </section>
+    
+    <section class="review">
+        <img src="<%= @user.profile_picture %>" />
+        <p><%= @user.first_name %> selects <span id="bold"><%= @game[@bet.user_picked] %></span> & wagers <span id="bold"><%= Rumoji.decode(@bet.wage) %></span></p>
+    
+        <div class="info">
+            <a href="<%= bet_rules_path %>">See Challenge Rules</a>
+        </div>
+    </section>
+    
+    <section class="submit-form" style="display: none;">
+        <% if @game.options.count > 2 %>
+            
+        <% else %>
+            <button class="button">Select <%= @game.options %> Accept Challenge</button>
+        <% end %>
+    </section>
+</div>
+
+<script>
+    $(document).ready(function(){
+        var psid;
+        
+        window.extAsyncInit = function() {
+            MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+                var psid = result.psid;
+                var buttons = ( psid == <%= @user.sender_id %> || <%= @bet.accepted %> == true ) ? '<a href="<%= ENV['ROOT_PATH']%>/bet/account/'+ psid +'" class="button" ><i class="fa fa-user" aria-hidden="true"></i>My Account</a>' : $('.submit-form').attr('user_id', psid);
+                
+                MessengerExtensions.askPermission(function(response) {
+                    var permissions = response.permissions;
+                    var isGranted = response.isGranted;
+                    if (isGranted && permissions.length == 2) {
+                        wrapper.append(appendWrapper);
+                        // $('.submit-form').html(buttons);
+                        allowSubmit();
+                        
+                    } else {
+                        MessengerExtensions.askPermission(function(response) {
+                            var permissions = response.permissions;
+                            var isGranted = response.isGranted;
+                            
+                            if (isGranted) {
+                                wrapper.append(appendWrapper);
+                                // $('.submit-form').html(buttons);
+                                allowSubmit();
+                            }
+                        }, function(errorCode, errorMessage) {
+                            wrapper.fadeOut(function(){
+                                $(this).html('<div class="error"><h2>Something went wrong</h2><p>We don\'t have permissions to continue.</p></div>').fadeIn();
+                            });
+                        }, "user_messaging" );
+                    }
+                    
+                    $('.submit-form').slideDown(500);
+                    
+                    function allowSubmit() {
+                        $('.submit-form button').click(function() {
+                            var bet_id, option;
+                            bet_id = <%= @bet.id %>;
+                            
+                            $.ajax({
+                                url : '<%= ENV['ROOT_PATH'] %>/bet/accept/' + bet_id,
+                                type : 'POST',
+                                data : {
+                                    'accept': true, 'token': psid
+                                },
+                                dataType:'json',
+                                success : function(data) {
+                                    $('.review').fadeOut(function(){
+                                        $(this).html('<div class="result"><i class="fa fa-check-circle" aria-hidden="true"></i><p>Challenge Accepted</p></div>').fadeIn();
+                                    });
+                                    $('.submit-form').slideUp(500, function(){
+                                        $(this).html('<a href="bet/account/'+ psid +'" class="button" ><i class="fa fa-user" aria-hidden="true"></i>My Account</a>');
+                                        $(this).slideDown(500);
+                                    });
+                                }
+                            });
+                        });
+                    }
+                      
+                }, function(errorCode, errorMessage) {
+                    wrapper.fadeOut(function(){
+                        $(this).html('<div class="error"><h2>Something went wrong</h2><p>We don\'t have permissions to continue.</p></div>').fadeIn();
+                    });
+                }, "user_profile" );
+                
+            }, function error(errorCode, errorMessage) {
+                console.log(errorCode, errorMessage)
+                $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+            });
+        }
+    });
+</script>

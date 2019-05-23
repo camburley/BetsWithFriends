@@ -1,0 +1,101 @@
+@import "variables";
+
+.daily-games, .pick-day { position: absolute; width: 100%;
+    h4 { padding: 5px; }
+    .game-list { border-top: $border; }
+    ul { margin: 0; padding: 0; }
+    li { list-style: none; padding: 13px; border-bottom: $border; color: $blue; cursor: pointer;
+        i { float: right; font-size: 10px; color: $gray; padding: 5px 0; }
+    }
+}
+
+.pick-day { display: none; left: 100%; }
+
+.game {
+    .creator { text-align: center; border-bottom: $border;
+        img { height: 60px; width: 60px; border-radius: 50%; }
+        p { font-size: 13px; color: #999; margin: 0; 
+            b { color: #000; }
+        }
+        p#label { margin-top: 10px; border-top: $border; border-bottom: none; }
+    }
+    .date { background-color: $white; padding: 10px;
+        span { font-size: 10px; }
+        span#time-remains { float: right; color: $gray; }
+    }
+    
+    .salary { border-bottom: $border; 
+        p { text-align: center; margin: 5px 0; }
+        p#avg_obj { color: $gray; font-size: 13px; padding-bottom: 10px; }
+        .back { display: none; position: absolute; top: 15px; font-size: 22px; left: 10px; transition: top 0.25s; color: $blue; cursor: pointer; }
+    }
+    .popup { position: fixed; bottom: 0; left: 0; width: 100%; background: $white; border-top: $border; border-bottom: 0; }
+    
+    .option-list { margin: 0; padding: 0;
+        li.option { list-style: none; padding: 13px 15px; border-bottom: $border; cursor: pointer;
+            span#option-data { color: $blue; }
+        }
+        li.player-obj { padding: 0; border: 0; 
+            .add { display: none;}
+        }
+    }
+    
+    .player-list { padding: 0; margin: 0; display: none; position: absolute; top: 61px; left: 0; height: calc(100% - 61px); background: $white; width: 100%; overflow: scroll; -webkit-overflow-scrolling: touch; transition: all 0.25s; }
+    
+    li.player-obj { display: flex; list-style: none; padding: 7px 5px; border-bottom: $border; white-space: nowrap; height: 55px;
+        div p { margin: 0; }
+        .image { width: 20%; padding: 0 5px; text-align: center; height: 100%;
+            img { height: 100%; max-width: 100%;}
+        }
+        .player { width: 45%; padding: 0 15px 0 0; overflow: hidden;
+            p#name { font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+                span { color: $blue; }
+            }
+            p#teams, {margin-bottom: 5px;}
+            p#teams, p#time { font-size: 11px; color: $gray; }
+        }
+        .player-info { width: 20%; padding: 0;
+            p#salary { font-weight: 600; }
+            p#projection { font-size: 11px; color: $gray; }
+        }
+        .add { width: 53px; height: 50px; border-radius: 50%; border: 1px solid $blue; background-color: #F7FCFE; color: $blue; padding: 5px 0; cursor: pointer;}
+    }
+    
+    .wager { padding-bottom: 100px;
+        .dropdown { position: absolute; right: 20px; font-size: 30px; margin-top: 5px; color: #3197ee; cursor: pointer; width: 100%; text-align: right; }
+        .set { display: none; border-bottom: $border; padding: 5.5px 25px; background-color: #fff; height: 30px;
+            span#wage { line-height: 30px; }
+            button { color: #0084FF; font-size: 22px; background: none; border: none; outline: none; cursor: pointer; -webkit-appearance: none;
+                &:active, &:focus { background: none; background-color: none; }
+            }
+        }
+        .custom { padding: 5.5px; }
+        .set input { width: 80%; height: 85%; border: 1px solid #ccc; border-radius: 25px; font-size: 15px; outline: none; padding: 3px 0 1px 20px; font-family: FontAwesome, "Open Sans", Verdana, sans-serif; 
+            &::placeholder { color: #ccc; }
+        }
+        .set[selected] { display: block !important; }
+    }
+    
+    .submit-form { display: none; }
+}
+
+.bet { display: none; border: $border; margin-bottom: 30px;
+    .starts { padding: 10px; font-size: 13px; border-bottom: $border; 
+        #time-remains { float: right; }
+    }
+    .game-name { padding: 5px 10px; } 
+    .team { padding: 5px 10px; border-bottom: $border;
+        .player { display: inline-block; height: 80px; width: 60px;
+            img { height: 60px; max-width: 60px; border-radius: 50%; }
+            span { display: block; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+        }
+    }
+    .competitors { border-bottom: $border;
+        .vs { display: flex; padding: 5px 10px;
+            img { height: 30px; width: 30px; border-radius: 50%; 
+                &:nth-child(2) { position: relative; right: 10px; }
+            }
+            p.name { padding: 8px 10px; margin: 0; font-size: 13px; color: #888; }
+        }
+    }
+}

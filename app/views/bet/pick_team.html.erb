@@ -1,0 +1,351 @@
+<%= stylesheet_link_tag 'bet/games' %>
+
+<script>
+    window.extAsyncInit = function() {
+        MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+            var psid = result.psid;
+            
+            var type = result.thread_type;
+            
+            MessengerExtensions.askPermission(function(response) {
+                var permissions = response.permissions;
+                var isGranted = response.isGranted;
+                if (isGranted && permissions.length == 2) {
+                    
+                } else {
+                    MessengerExtensions.askPermission(function(response) {
+                        var permissions = response.permissions;
+                        var isGranted = response.isGranted;
+                        
+                    }, function(errorCode, errorMessage) {
+                        $('.wrapper').fadeOut(function(){
+                            $(this).html('<div class="error"><h2>Something went wrong</h2><p>We don\'t have permissions to continue.</p></div>').fadeIn();
+                        });
+                    }, "user_messaging" );
+                }
+                  
+            }, function(errorCode, errorMessage) {
+                $('.wrapper').fadeOut(function(){
+                    $(this).html('<div class="error"><h2>Something went wrong</h2><p>We don\'t have permissions to continue.</p></div>').fadeIn();
+                });
+            }, "user_profile" );
+            
+            <% if @bet && @creator %>
+                var creator = <%= @creator.sender_id.to_i %>
+                
+                if(creator == psid){
+                    $('.wrapper').hide().remove();
+                    $('.bet').show();
+                    $('.submit-form a').attr('href', '<%= ENV['ROOT_PATH']%>/account/'+psid);
+                } else if(creator != psid) {
+                    if(<%= @bet.accepted %>){
+                        $('.wrapper').hide().remove();
+                        $('.bet').show();
+                        $('.submit-form a').attr('href', '<%= ENV['ROOT_PATH']%>/account/'+psid);
+                    }else{
+                        $('.bet').remove();
+                        $('.submit-form button').click(function(){
+                            acceptBet(psid);
+                        });
+                    }
+                }
+            <% else %>
+                $('.submit-form button').click(function(){
+                    createBet(psid, type);
+                });
+            <% end %>
+            
+        }, function error(errorCode, errorMessage) {      
+            $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+        });
+    }
+</script>
+
+<% unless params[:bet_id] %>
+    <script>
+        function createBet(psid, type) {
+            var game_id = <%= @game.id %>;
+            var wage;
+            
+            if($('.set[selected] span#wage').length >= 1) {
+                wage = $('.set[selected] span#wage').text();
+            } else {
+                wage = $('.set[selected] input#wage').val();
+            }
+            
+            var ids = [];
+            $('.option').each(function(){
+                ids.push($(this).find('.player-obj').attr('player_id'));
+            });
+            
+            $.ajax({
+                url : '<%= ENV['ROOT_PATH'] %>/pick_team/' + psid,
+                type : 'POST',
+                data : {
+                    'create': true, 'game_id': game_id, 'wage': wage, 'day': <%= params[:day] %>, 'game_time': '<%= @schedules.first.game_time %>', 'players': ids
+                },
+                dataType:'json',
+                success : function(data) {
+                    var messageToShare = {
+                        "attachment":{
+                           "type":"template",
+                           "payload":{
+                               "template_type":"generic",
+                               "elements": [{
+                                   "title": "Your friend " + data['user_name'] + " just challenged you for a " + data['wage'] + "!",
+                                   "image_url": "<%= @game.image %>" || "https://s3.amazonaws.com/audiencetrending/facebook_handshake.png",
+                                   "subtitle": "<%= @game.title %>",
+                                   "buttons":[{
+                                       "type":"web_url",
+                                       "url":"<%= ENV["ROOT_PATH"] %>/pick_team/" + psid + "?bet_id=" + data["bet_id"],
+                                       "title":"See Details",
+                                       "messenger_extensions": true,
+                                       "webview_height_ratio": "full",
+                                       "fallback_url": "<%= ENV["ROOT_PATH"] %>/pick_team/" + psid + "?bet_id=" + data["bet_id"]
+                                   }]
+                               }]
+                           }
+                        }
+                    };
+                      
+                    shareMessage(messageToShare, type, psid);
+                }
+            });
+        };
+        
+        function shareMessage(messageToShare, type, psid) {
+            var share_type = type == "USER_TO_USER" ? 'current_thread' : "broadcast";
+            MessengerExtensions.beginShareFlow(function success(response) {
+                $('.wrapper').fadeOut(function(){
+                    $(this).html('<div class="success"><i class="fa fa-check-circle" aria-hidden="true"></i><h2>Challenge Sent</h2><p>Your friend has been sent a notification.</p><div class="submit-form"><a href="<%= ENV["ROOT_PATH"] %>/account/'+psid+'" class="button">My Account</a></div>').fadeIn();
+                });
+            }, function error(errorCode, errorMessage, psid) {      
+                $('.wrapper').fadeOut(function(){
+              	    $(this).html('<div class="error"><h2>Something went wrong</h2><p>Bet was created, but we could\'t finish sharing.</p><div class="submit-form"><a href="<%= ENV["ROOT_PATH"] %>/account/'+psid+'" class="button">My Account</a></div></div>').fadeIn();
+                });
+            },
+            messageToShare, share_type); 
+        };
+    </script>
+<% else %>
+    <script>
+        function acceptBet(psid) {
+            var bet_id = <%= @bet.id %>
+            
+            var ids = [];
+            $('.option').each(function(){
+                ids.push($(this).find('.player-obj').attr('player_id'));
+            });
+            
+            $.ajax({
+                url : '<%= ENV['ROOT_PATH'] %>/pick_team/' + psid,
+                type : 'POST',
+                data : {
+                    'accept': true, 'bet_id': bet_id, 'players': ids
+                },
+                dataType:'json',
+                success : function(data) {
+                    $('.wrapper').fadeOut(function(){
+                        $(this).html('<div class="success"><i class="fa fa-check-circle" aria-hidden="true"></i><h2>Challenge accepted!</h2><p>Your friend received notification.</p><div class="submit-form"><a href="<%= ENV["ROOT_PATH"] %>/get_user?page=account" class="button">My Account</a></div></div>').fadeIn();
+                    });
+                }
+            });
+        }
+    </script>
+<% end %>
+
+<% if @bet %>
+    <div class="bet">
+        <div class="starts">Starts <%= Schedule.first_game(@bet.day, @bet.week).game_time.strftime("%a %l%P") %> <span id="time-remains"><%= distance_of_time_in_words(Time.now, Schedule.first_game(@bet.day, @bet.week).game_time) %></span></div>
+        <div class="team">
+            <% @bet.user_picked.each do |player| %>
+                <div class="player">
+                    <%= image_tag Player.find_by_id(player).image.nil? ? 'https://s3.amazonaws.com/vastvideos%2Fnew/693bfc41cb2f0c1b15a5f86e1d849fc0/default.png' : Player.find_by_id(player).image %>
+                    <span><%= Player.find_by_id(player).name %></span>
+                </div>
+            <% end %>
+        </div>
+        <div class="competitors">
+            <div class="vs">
+                <%= image_tag User.find_by_id(@bet.user_id).profile_picture.nil? ? '' : User.find_by_id(@bet.user_id).profile_picture %>
+                <%= image_tag User.find_by_id(@bet.opponent) && !User.find_by_id(@bet.opponent).profile_picture.nil? ? User.find_by_id(@bet.opponent).profile_picture : 'user_pic.png' %>
+                <p class="name"><%= User.find_by_id(@bet.user_id).first_name %> vs <%= User.find_by_id(@bet.opponent) ? User.find_by_id(@bet.opponent).first_name : 'Pending...' %></p>
+            </div>
+        </div>
+        <div class="submit-form">
+            <a class="button">My Account</a>
+        </div>
+    </div>
+<% end %>
+
+<div class="wrapper">
+    <% if @schedules && @schedules.any? %>
+        <div class="game">
+            <% if @creator && @bet.accepted == false %>
+                <div class="creator">
+                    <%= image_tag @creator.profile_picture %>
+                    <p><%= @creator.first_name %> wagers <b><%= @bet.wage %></b> for this game</p>
+                    <p id="label"></p>
+                </div>
+            <% end %>
+            <div class="date">
+                <span id="date">Starts <%= @schedules.first.game_time.strftime("%a %l%p")  %></span>
+                <span id="time-remains"><%= distance_of_time_in_words(Time.now, @schedules.first.game_time) %></span>
+            </div>
+            
+            <div class="salary" data-budget="<%= @game.budget %>">
+                <i class="fa fa-chevron-left back" aria-hidden="true"></i>
+                <p>$<span id="budget"><%= @game.budget %></span></p>
+                <p id="avg_obj">$<span id="avg-remaining"><%= @game.budget / @game.options.count %></span> per player position(<span id="remaining"><%= @game.options.count %></span>)</p>
+            </div>
+            
+            <p id="label">CHOOSE LINEUP</p>
+            <ul class="option-list">
+                <% @game.options.each_with_index do |option, i| %>
+                    <li id="option_<%= i %>" class="option" onclick="pick_player(<%= i %>)" position="<%= option %>">Select <span id="option-data"><%= option %></span></li>
+                <% end %>
+            </ul>
+            
+            <% unless params[:bet_id] %>
+                <section class="wager">
+                    <p id="label">SET WAGER</p>
+                    <i class="fa fa-angle-down dropdown" aria-hidden="true"></i>
+                    <div class="set custom">
+                        <input type="text" id="wage" placeholder="&#xf040; Custom Wager">
+                    </div>
+                    <% @wagers.each_with_index do |wager, i| %>
+                        <div class="set" <%= i == 0 ? 'selected="selected"' : '' %>>
+                            <span id="wage"><%= Rumoji.decode(wager) %></span>
+                        </div>
+                    <% end %>
+                </section>
+            
+                <div class="submit-form">
+                    <button class="button">Invite Friend to Game</button>
+                </div>
+            <% else %>
+                <div class="submit-form">
+                    <button class="button">Accept This Challenge</button>
+                </div>
+            <% end %>
+            
+            <ul class="player-list">
+                <div class="players">
+                    <% @players.each do |player| %>
+                        <% if player.salary.any? && player.prediction.any? %>
+                            <li class="player-obj" data-salary="<%= player.salary[-1]["week_#{@schedules.first.week}"] %>" position="<%= player.position %>" player_id="<%= player.id %>">
+                                <div class="image">
+                                    <%= image_tag player.image.nil? ? 'https://s3.amazonaws.com/vastvideos%2Fnew/693bfc41cb2f0c1b15a5f86e1d849fc0/65x90_default.png' : player.image %>
+                                </div>
+                                <div class="player">
+                                    <p id="name"><span><%= player.position %></span> <%= player.name %></p>
+                                    <p id="teams"><b style="color: #555;"><%= player.team %></b> vs <%= player.opponent %></p>
+                                    <p id="time"><%= @schedules.find_by(:home_team => [player.team, player.opponent], :away_team => [player.team, player.opponent]).game_time.strftime("%a %l%P") unless @schedules.find_by(:home_team => [player.team, player.opponent], :away_team => [player.team, player.opponent]).nil? %></p>
+                                </div>
+                                <div class="player-info">
+                                    <p id="salary">$<span id="player-salary"><%= player.salary[-1]["week_#{@schedules.first.week}"] %></span></p>
+                                    <p id="projection"><%= player.prediction[-1]["week_#{@schedules.first.week}"] %> PPG</p>
+                                </div>
+                                <button class="add"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                            </li>
+                        <% end %>
+                    <% end %>
+                </div>
+            </ul>
+        </div>
+    <% else %>
+        <div class="error">
+            <h2>No Games</h2>
+            <p>We are sorry, but we don't any have games for these day(s).</p>
+        </div>
+    <% end %>
+</div>
+
+<script>
+    function pick_player(id){
+        var budget = parseInt($('#budget').text());
+        $(document).scrollTop(0);
+        $('html, body').css({
+            overflow: 'hidden',
+            height: '100%'
+        });
+        
+        if($("#option_"+id).find('.player-obj').length) {
+            $('#budget').text(parseInt($("#option_"+id).find('.player-obj').data('salary')) + budget);
+        }
+        
+        $('.game .date, .creator').hide();
+        
+        $('.back').click(function(){
+            $('.player-list, .back').hide();
+            $('#budget').text(budget);
+            $('.game .date, .creator').show();
+            
+            $('html, body').css({
+                overflow: 'auto',
+                height: 'auto'
+            });
+
+            $('.add').off("click");
+        });
+        
+        $('.player-list').find('li').hide();
+        $('.player-list').find('li[position='+ $("#option_"+id).attr('position') +']').show();
+        $('.player-list, .back').show(0,function(){
+            
+            $(this).find('.add').on('click', function(){
+                var player_obj = $(this).parent();
+                var salary = parseInt(player_obj.data('salary'));
+                var budget = parseInt($('#budget').text());
+                var options = $('.option').length;
+                
+                if(budget - salary >= 0){
+                   $("#option_"+id).empty().append(player_obj);
+                   
+                   $('#budget').text(budget - salary);
+                   $('.player-list, .back').hide();
+                   $('.game .date, .creator').show();
+                   
+                   var players = $('.option').find('.player-obj').length;
+                   if ((options - players) > 0){
+                       $('#remaining').text(options - players);
+                       $('#avg-remaining').text(((budget - salary) / (options - players)).toFixed(0));
+                   } else {
+                       $('#remaining').text(0);
+                       $('#avg-remaining').text(0);
+                       
+                       $('.submit-form').show();
+                   }
+                }
+                
+                $('html, body').css({
+                    overflow: 'auto',
+                    height: 'auto'
+                });
+
+                $('.add').off("click");
+            });
+        });
+    }
+    
+    $(function(){
+        var divList = $(".player-obj");
+        divList.sort(function(a, b){
+            return $(b).data("salary")-$(a).data("salary")
+        });
+        $(".players").html(divList);
+        
+        $('.dropdown').click(function(){
+            
+            $('.dropdown').fadeOut(250);
+            
+            $('.set').removeAttr('selected').show().click(function(){
+                
+                $(this).attr('selected', true);
+                $('.set').hide();
+                $('.dropdown').fadeIn(250);
+            });
+        });
+        
+    });
+</script>

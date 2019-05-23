@@ -1,0 +1,32 @@
+@import "variables";
+
+.create-league { height: 100vh; background-color: $gray;
+    label { padding-left: 10px; font-size: $text_8; color: #A8A8A8; }
+    input { display: block; padding-left: 10px; margin-top: 10px; height: 50px; width: 100%; border: none; font-size: $text_14; outline: none; border-bottom: $border; border-top: $border;}
+}
+
+.header { display: flex; border-bottom: $border; padding: 0 10px; margin-bottom: 15px;
+    .name, .new-game { width: 50%;
+        p { font-weight: 600; }
+        a { display: block; margin: 10px 0; padding: 5px 0; text-align: center; border: 1px solid $blue; border-radius: 4px; text-decoration: none; color: $blue; transition: all 0.5s;
+            &:hover { background-color: $blue; color: #fff; }
+        }
+    }
+}
+
+.players {
+    .player { border-bottom: $border; height: 40px; padding: 5px 10px; display: flex;
+        img { height: 40px; width: 40px; border-radius: 50%; }
+        p { width: 60%; padding: 10px; margin: 0; }
+        span { width: 40%; padding: 10px; text-align: right; }
+    }
+}
+
+.user { text-align: center; margin-top: 10px;
+    img { width: 50px; height: 50px; border-radius: 50%; }
+    p { color: #555; font-size: $text_8; }
+}
+
+.league { text-align: center; border-top: $border; border-bottom: $border; margin-top: 50px;
+    p { color: $blue; }
+}

@@ -1,0 +1,11 @@
+<% if flash[:notice].present? %>
+  <p class='flash-notice'><%= flash[:notice] %></p>
+<% end %>
+
+<div class="add_players">
+    <%= form_tag admin_add_players_path, :authenticity_token => true, multipart: true do %>
+        <%= select_tag "file_type", "<option>Players</option><option>Salaries</option>".html_safe %>
+        <%= file_field_tag 'file' %>
+        <%= submit_tag 'submit' %>
+    <% end %>
+</div>

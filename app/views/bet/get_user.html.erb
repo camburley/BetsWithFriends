@@ -1,0 +1,22 @@
+<script>
+    window.extAsyncInit = function() {
+        MessengerExtensions.getContext('<%= ENV['APP_ID'] %>', function success(result) {
+            var psid = result.psid;
+            
+            <% unless params[:user_id] %>
+                <% if @page == "account" %>
+                    window.location.replace("<%= ENV["ROOT_PATH"] %>/account/"+psid);
+                <% elsif @page == "live" %>
+                    window.location.replace("<%= ENV["ROOT_PATH"] %>/account/"+psid+"?live=true");
+                <% elsif @page == "leagues" %>
+                    window.location.replace("<%= ENV["ROOT_PATH"] %>/account/"+psid+"?show_leagues=true");
+                <% else %>
+                    window.location.replace("<%= ENV["ROOT_PATH"] %>/bet/"+psid);
+                <% end %>
+            <% end %>
+            
+        }, function error(errorCode, errorMessage) {      
+            $('body').html('<div class="error"><h2>Viewing Outside Messenger App</h2><p>It looks like you are viewing this list outside of the Messenger app. This experience has been designed to work within the app on iOS or Android.</p><p>Head over to the Messenger app on your mobile device for a better experience.</p></div>');
+        });
+    }
+</script>
