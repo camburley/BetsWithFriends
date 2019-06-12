@@ -3,6 +3,7 @@ Original App on Faecbook was called FlashLeague....
 
 ![alt text](https://superwall.s3.us-east-2.amazonaws.com/content/morefun.png)
 
+
 ## Changelog
 #### Release v1.2
 - Add I Message to Post, Fix Post method
@@ -10,6 +11,8 @@ Original App on Faecbook was called FlashLeague....
 - Dynamically changing game week
 - Add answer_taken to Post table
 - Removed players json objects(images)
+
+![alt text](https://superwall.s3.us-east-2.amazonaws.com/content/Group.png) 
 
 #### Release v1.1 - STABLE
 - Fixed Gamestart Alerts
