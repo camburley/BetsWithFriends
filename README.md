@@ -1,6 +1,8 @@
 # BetsWithFriends
 Original App on Faecbook was called FlashLeague....
 
+![alt text](https://superwall.s3.us-east-2.amazonaws.com/content/morefun.png)
+
 ## Changelog
 #### Release v1.2
 - Add I Message to Post, Fix Post method
